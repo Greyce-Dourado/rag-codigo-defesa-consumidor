@@ -1,0 +1,37 @@
+[project]
+name = "rag-legislacao"
+version = "0.1.0"
+description = "RAG canônico sobre legislação brasileira (CDC), com avaliação de recuperação e geração."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "sentence-transformers>=3.0",  # embeddings (bge-m3) e cross-encoder (reranker)
+    "torch>=2.2",                  # backend CPU dos modelos
+    "psycopg[binary]>=3.1",        # cliente Postgres
+    "pgvector>=0.3",               # tipos/adaptadores pgvector para Python
+    "google-genai>=0.3",           # geração via Gemini (free tier)
+    "pydantic>=2.6",               # schemas de saída estruturada e config
+    "python-dotenv>=1.0",
+    "numpy>=1.26",
+    "httpx>=0.27",                 # download do corpus
+    "beautifulsoup4>=4.12",        # parsing do HTML do Planalto
+    "lxml>=5.0",
+    "typer>=0.12",                 # CLI dos scripts
+    "rich>=13.7",
+]
+
+[project.optional-dependencies]
+eval = ["ragas>=0.2", "datasets>=2.19"]  # cross-check opcional da avaliação
+dev = ["pytest>=8.0", "ruff>=0.5"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+
+# Ambiente
+.env
+
+# Dados (reproduzíveis via scripts; não versionar)
+data/raw/*
+data/processed/*
+!data/**/.gitkeep
+
+# Caches de modelos
+.cache/
+*.pt
+
+# Ferramentas
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.DS_Store
