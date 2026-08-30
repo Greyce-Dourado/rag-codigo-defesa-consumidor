@@ -102,7 +102,7 @@ python scripts/evaluate.py    # roda a suíte de avaliação
 ## Roadmap
 
 - [x] Esqueleto do projeto (estrutura, docker, config, README)
-- [ ] **Etapa 1** — Ingestão + chunking estrutural do CDC
+- [x] **Etapa 1** — Ingestão + chunking estrutural do CDC (108 artigos; 11 vetados excluídos)
 - [ ] **Etapa 2** — Embeddings + indexação no pgvector (HNSW + FTS)
 - [ ] **Etapa 3** — Retrieval (dense) + geração com citação (Gemini)
 - [ ] **Etapa 4** — Suíte de avaliação de recuperação (recall@k / MRR / nDCG) + eval-set
