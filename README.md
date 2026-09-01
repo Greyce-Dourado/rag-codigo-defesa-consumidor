@@ -105,7 +105,7 @@ python scripts/evaluate.py    # roda a suíte de avaliação
 - [x] **Etapa 1** — Ingestão + chunking estrutural do CDC (108 artigos; 11 vetados excluídos)
 - [x] **Etapa 2** — Embeddings + indexação no pgvector (bge-m3, 108 vetores, HNSW + FTS)
 - [x] **Etapa 3** — Retrieval (dense) + geração com citação (Gemini)
-- [ ] **Etapa 4** — Suíte de avaliação de recuperação (recall@k / MRR / nDCG) + eval-set
+- [x] **Etapa 4** — Avaliação de recuperação (recall@k / MRR / nDCG) + eval-set (18 perguntas; baseline denso MRR 0.898)
 - [ ] **Etapa 5** — Re-ranking + experimento comparativo (com/sem rerank; dense vs hybrid)
 - [ ] **Etapa 6** — Avaliação de geração (groundedness, citação) via Gemini-as-judge
 - [ ] Polimento: `docs/decisoes.md`, testes, README final

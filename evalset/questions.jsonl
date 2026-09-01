@@ -1,2 +1,18 @@
-{"id": "q001", "pergunta": "Comprei um produto pela internet e me arrependi. Tenho quanto tempo para desistir da compra?", "artigos_relevantes": ["art_49"], "nota": "Direito de arrependimento em compras fora do estabelecimento comercial (7 dias)."}
+{"id": "q001", "pergunta": "Comprei um produto pela internet e me arrependi. Tenho quanto tempo para desistir da compra?", "artigos_relevantes": ["art_49"], "nota": "Direito de arrependimento em compras fora do estabelecimento (7 dias)."}
 {"id": "q002", "pergunta": "O fornecedor pode se recusar a trocar um produto com defeito que não foi consertado no prazo?", "artigos_relevantes": ["art_18"], "nota": "Vícios de qualidade; prazo de 30 dias e alternativas do consumidor."}
+{"id": "q003", "pergunta": "Quem é que a lei considera consumidor?", "artigos_relevantes": ["art_2"], "nota": "Definição de consumidor."}
+{"id": "q004", "pergunta": "Uma empresa pública que presta serviços entra na definição de fornecedor?", "artigos_relevantes": ["art_3"], "nota": "Definição de fornecedor."}
+{"id": "q005", "pergunta": "Que garantias fundamentais a lei assegura a quem consome?", "artigos_relevantes": ["art_6"], "nota": "Direitos básicos do consumidor."}
+{"id": "q006", "pergunta": "Em quanto tempo perco o direito de reclamar de um defeito fácil de perceber?", "artigos_relevantes": ["art_26"], "nota": "Decadência para vícios aparentes (30/90 dias)."}
+{"id": "q007", "pergunta": "Qual o prazo para pedir indenização por um dano causado por um produto defeituoso?", "artigos_relevantes": ["art_27"], "nota": "Prescrição de 5 anos para fato do produto/serviço."}
+{"id": "q008", "pergunta": "Fui cobrado por uma dívida que eu já tinha pago. Tenho direito a alguma devolução?", "artigos_relevantes": ["art_42"], "nota": "Cobrança indevida: devolução em dobro (parágrafo único)."}
+{"id": "q009", "pergunta": "É permitido um anúncio que induz o cliente ao erro?", "artigos_relevantes": ["art_37"], "nota": "Publicidade enganosa e abusiva é proibida."}
+{"id": "q010", "pergunta": "A loja pode exigir que eu leve um segundo produto para poder comprar o primeiro?", "artigos_relevantes": ["art_39"], "nota": "Prática abusiva: venda casada."}
+{"id": "q011", "pergunta": "Uma cláusula que coloca o cliente em desvantagem exagerada tem validade?", "artigos_relevantes": ["art_51"], "nota": "Cláusulas abusivas são nulas de pleno direito."}
+{"id": "q012", "pergunta": "Quem responde quando um defeito de fabricação causa um acidente?", "artigos_relevantes": ["art_12"], "nota": "Responsabilidade do fabricante por fato do produto."}
+{"id": "q013", "pergunta": "Um serviço mal executado que gera prejuízo responsabiliza o prestador mesmo sem culpa?", "artigos_relevantes": ["art_14"], "nota": "Responsabilidade objetiva do fornecedor de serviços."}
+{"id": "q014", "pergunta": "Posso ter acesso aos meus dados guardados em cadastros de crédito?", "artigos_relevantes": ["art_43"], "nota": "Acesso a bancos de dados e cadastros de consumidores."}
+{"id": "q015", "pergunta": "Vale um contrato cujo conteúdo não me deram a chance de conhecer antes de assinar?", "artigos_relevantes": ["art_46"], "nota": "Contratos só obrigam se houve conhecimento prévio."}
+{"id": "q016", "pergunta": "Quando uma cláusula do contrato é ambígua, a favor de quem ela é interpretada?", "artigos_relevantes": ["art_47"], "nota": "Interpretação mais favorável ao consumidor."}
+{"id": "q017", "pergunta": "A garantia oferecida pela loja substitui a garantia prevista em lei?", "artigos_relevantes": ["art_50"], "nota": "Garantia contratual é complementar à legal."}
+{"id": "q018", "pergunta": "A loja anunciou uma condição e agora se recusa a cumprir. O que o consumidor pode exigir?", "artigos_relevantes": ["art_35"], "nota": "Recusa de cumprimento da oferta: alternativas do consumidor."}
