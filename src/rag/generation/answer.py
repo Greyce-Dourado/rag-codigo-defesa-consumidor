@@ -7,7 +7,7 @@ from google.genai import types
 from pydantic import BaseModel
 
 from rag.config import settings
-from rag.retrieval.search import dense_search
+from rag.retrieval.search import dense_then_rerank
 
 # System instruction: prende o modelo ao contexto recuperado. É a principal defesa contra
 # alucinação — o modelo só pode responder com base nos artigos que passamos.
@@ -45,7 +45,7 @@ def _format_context(chunks: list[dict]) -> str:
 
 
 def answer(query: str, k: int = 5) -> tuple[Resposta, list[dict]]:
-    chunks = dense_search(query, k=k)
+    chunks = dense_then_rerank(query, k=k, candidates=20)  # config vencedora da Etapa 5
     prompt = (
         f"Contexto (artigos do CDC recuperados):\n{_format_context(chunks)}\n\n"
         f"Pergunta: {query}"

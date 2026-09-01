@@ -107,7 +107,7 @@ python scripts/evaluate.py    # roda a suíte de avaliação
 - [x] **Etapa 3** — Retrieval (dense) + geração com citação (Gemini)
 - [x] **Etapa 4** — Avaliação de recuperação (recall@k / MRR / nDCG) + eval-set (18 perguntas; baseline denso MRR 0.898)
 - [x] **Etapa 5** — Re-ranking (cross-encoder) + experimento comparativo. Rerank elevou MRR 0.898→0.972 e Hit@1 0.833→0.944, sem regressões. (Extensão futura: busca híbrida lexical.)
-- [ ] **Etapa 6** — Avaliação de geração (groundedness, citação) via Gemini-as-judge
+- [x] **Etapa 6** — Avaliação de geração: citação (objetiva) + groundedness (Gemini-as-judge). Código completo; execução em amostra por limite de free tier (~20 req/dia)
 - [ ] Polimento: `docs/decisoes.md`, testes, README final
 
 ## Licença
