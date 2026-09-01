@@ -106,7 +106,7 @@ python scripts/evaluate.py    # roda a suíte de avaliação
 - [x] **Etapa 2** — Embeddings + indexação no pgvector (bge-m3, 108 vetores, HNSW + FTS)
 - [x] **Etapa 3** — Retrieval (dense) + geração com citação (Gemini)
 - [x] **Etapa 4** — Avaliação de recuperação (recall@k / MRR / nDCG) + eval-set (18 perguntas; baseline denso MRR 0.898)
-- [ ] **Etapa 5** — Re-ranking + experimento comparativo (com/sem rerank; dense vs hybrid)
+- [x] **Etapa 5** — Re-ranking (cross-encoder) + experimento comparativo. Rerank elevou MRR 0.898→0.972 e Hit@1 0.833→0.944, sem regressões. (Extensão futura: busca híbrida lexical.)
 - [ ] **Etapa 6** — Avaliação de geração (groundedness, citação) via Gemini-as-judge
 - [ ] Polimento: `docs/decisoes.md`, testes, README final
 

@@ -23,6 +23,15 @@ def dense_search(query: str, k: int = 5) -> list[dict]:
         return [dict(zip(cols, row)) for row in cur.fetchall()]
 
 
+def dense_then_rerank(query: str, k: int = 5, candidates: int = 20) -> list[dict]:
+    """Duas etapas: bi-encoder pega `candidates` candidatos (rápido), cross-encoder reordena
+    e devolve os `k` melhores (preciso). Import tardio pra não carregar o reranker sem uso."""
+    from rag.retrieval.rerank import rerank
+
+    cands = dense_search(query, k=candidates)
+    return rerank(query, cands, top_k=k)
+
+
 if __name__ == "__main__":
     import sys
 

@@ -1,7 +1,11 @@
-"""Etapa 4 — avalia a recuperação densa contra o evalset (ground truth por artigo).
+"""Etapa 4/5 — avalia e COMPARA estratégias de recuperação contra o evalset.
 
-Roda cada pergunta pela busca densa, calcula Hit/Recall/nDCG @k e MRR, e mostra a posição do
-1º artigo relevante por pergunta (pra investigar acertos e erros).
+Estratégias:
+  - densa         : bi-encoder (bge-m3) + cosseno, top-10.
+  - densa+rerank  : bi-encoder pega 20 candidatos, cross-encoder reordena para top-10.
+
+Mostra a tabela de métricas lado a lado e a posição do 1º artigo relevante por pergunta em
+cada estratégia (pra ver onde o rerank ajudou ou atrapalhou).
 
 Uso:  ./.venv/bin/python scripts/evaluate.py
 """
@@ -15,48 +19,73 @@ from rich.console import Console
 from rich.table import Table
 
 from rag.eval.metrics import hit_at_k, ndcg_at_k, recall_at_k, reciprocal_rank
-from rag.retrieval.search import dense_search
+from rag.retrieval.search import dense_search, dense_then_rerank
 
 ROOT = Path(__file__).resolve().parents[1]
 EVALSET = ROOT / "evalset" / "questions.jsonl"
 
-KS = [1, 3, 5, 10]
-RETRIEVE_K = 10
+FINAL = 10        # tamanho do ranking avaliado
+CANDIDATES = 20   # candidatos do 1º estágio para o rerank
 
 console = Console()
+
+STRATEGIES = {
+    "densa": lambda q: [r["id"] for r in dense_search(q, k=FINAL)],
+    "densa+rerank": lambda q: [r["id"] for r in dense_then_rerank(q, k=FINAL, candidates=CANDIDATES)],
+}
+
+
+def run(strategy_fn, questions):
+    return [
+        (q, strategy_fn(q["pergunta"]), set(q["artigos_relevantes"]))
+        for q in questions
+    ]
+
+
+def primeiro_rank(ranked, rel):
+    return next((i for i, rid in enumerate(ranked, 1) if rid in rel), None)
 
 
 def main() -> int:
     questions = [json.loads(line) for line in EVALSET.open(encoding="utf-8")]
+    n = len(questions)
 
-    # Recupera uma vez por pergunta (top-RETRIEVE_K) e guarda o ranking de ids.
-    resultados = []
-    for q in questions:
-        ranked = [r["id"] for r in dense_search(q["pergunta"], k=RETRIEVE_K)]
-        resultados.append((q, ranked, set(q["artigos_relevantes"])))
+    console.print(f"Rodando {len(STRATEGIES)} estratégias sobre {n} perguntas…\n")
+    resultados = {nome: run(fn, questions) for nome, fn in STRATEGIES.items()}
 
-    n = len(resultados)
-    table = Table(title=f"Recuperação densa (bge-m3) — N={n}")
-    table.add_column("métrica")
-    for k in KS:
-        table.add_column(f"@{k}", justify="right")
+    # Tabela comparativa das métricas.
+    tabela = Table(title=f"Comparação de estratégias — N={n}")
+    tabela.add_column("métrica")
+    for nome in STRATEGIES:
+        tabela.add_column(nome, justify="right")
 
-    for nome, fn in [("Hit rate", hit_at_k), ("Recall", recall_at_k), ("nDCG", ndcg_at_k)]:
-        row = [nome]
-        for k in KS:
-            media = sum(fn(ranked, rel, k) for _, ranked, rel in resultados) / n
-            row.append(f"{media:.3f}")
-        table.add_row(*row)
+    linhas = [
+        ("Hit@1", lambda pq: sum(hit_at_k(r, rel, 1) for _, r, rel in pq) / n),
+        ("Hit@3", lambda pq: sum(hit_at_k(r, rel, 3) for _, r, rel in pq) / n),
+        ("Recall@5", lambda pq: sum(recall_at_k(r, rel, 5) for _, r, rel in pq) / n),
+        ("nDCG@10", lambda pq: sum(ndcg_at_k(r, rel, 10) for _, r, rel in pq) / n),
+        ("MRR", lambda pq: sum(reciprocal_rank(r, rel) for _, r, rel in pq) / n),
+    ]
+    for nome_metrica, calc in linhas:
+        tabela.add_row(nome_metrica, *[f"{calc(resultados[s]):.3f}" for s in STRATEGIES])
+    console.print(tabela)
 
-    console.print(table)
-    mrr = sum(reciprocal_rank(ranked, rel) for _, ranked, rel in resultados) / n
-    console.print(f"[bold]MRR:[/] {mrr:.3f}\n")
-
-    console.print("[bold]Posição do 1º artigo relevante por pergunta:[/]")
-    for q, ranked, rel in resultados:
-        pos = next((i for i, rid in enumerate(ranked, 1) if rid in rel), None)
-        marca = f"rank {pos}" if pos else "[red]FORA do top-10[/]"
-        console.print(f"  {q['id']}  (esperado {sorted(rel)[0]}): {marca}")
+    # Posição do 1º relevante por pergunta, lado a lado.
+    console.print("\n[bold]Posição do 1º artigo relevante (por pergunta):[/]")
+    porq = Table()
+    porq.add_column("pergunta")
+    porq.add_column("esperado")
+    for nome in STRATEGIES:
+        porq.add_column(nome, justify="right")
+    base = resultados["densa"]
+    for idx, (q, _, rel) in enumerate(base):
+        row = [q["id"], sorted(rel)[0]]
+        for nome in STRATEGIES:
+            _, ranked, _ = resultados[nome][idx]
+            pos = primeiro_rank(ranked, rel)
+            row.append(str(pos) if pos else "—")
+        porq.add_row(*row)
+    console.print(porq)
     return 0
 
 
