@@ -103,7 +103,7 @@ python scripts/evaluate.py    # roda a suíte de avaliação
 
 - [x] Esqueleto do projeto (estrutura, docker, config, README)
 - [x] **Etapa 1** — Ingestão + chunking estrutural do CDC (108 artigos; 11 vetados excluídos)
-- [ ] **Etapa 2** — Embeddings + indexação no pgvector (HNSW + FTS)
+- [x] **Etapa 2** — Embeddings + indexação no pgvector (bge-m3, 108 vetores, HNSW + FTS)
 - [ ] **Etapa 3** — Retrieval (dense) + geração com citação (Gemini)
 - [ ] **Etapa 4** — Suíte de avaliação de recuperação (recall@k / MRR / nDCG) + eval-set
 - [ ] **Etapa 5** — Re-ranking + experimento comparativo (com/sem rerank; dense vs hybrid)
