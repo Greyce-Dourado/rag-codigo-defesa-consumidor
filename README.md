@@ -1,38 +1,47 @@
-# RAG sobre Legislação Brasileira (CDC)
+# RAG sobre o Código de Defesa do Consumidor
 
-RAG (Retrieval-Augmented Generation) canônico e de baixo custo sobre o **Código de Defesa do
-Consumidor** (Lei 8.078/1990), construído para responder perguntas em linguagem natural
-**citando o artigo** que fundamenta a resposta — e para **medir**, com métricas objetivas, se a
-recuperação e a geração estão boas.
+Sistema de **RAG (Retrieval-Augmented Generation)** canônico que responde perguntas em linguagem
+natural sobre o **Código de Defesa do Consumidor** (Lei 8.078/1990) **citando o artigo** que
+fundamenta a resposta — e que **mede**, com métricas objetivas, a qualidade da recuperação e da
+geração.
 
-> Este repositório é tanto um projeto de estudo de RAG do zero quanto uma peça de portfólio. O
-> foco não é "funcionar", é **entender e justificar cada decisão de arquitetura**. As seções de
-> decisão abaixo são a parte mais importante do repo.
->
-> _README em português; uma versão em inglês pode ser adicionada depois._
+Projeto de estudo e portfólio: RAG construído do zero (chunking, embeddings, busca vetorial,
+re-ranking, avaliação), em stack open-source e **custo zero**. O foco não é só "funcionar" — é
+**justificar cada decisão de arquitetura** e **comprovar por experimento** o efeito de cada peça.
 
-## Status
-
-🚧 Em construção. Etapa atual: **esqueleto do projeto**. Ver [Roadmap](#roadmap).
+> _README em português. Uma versão em inglês pode ser adicionada depois._
 
 ---
 
-## Por que este projeto existe
+## Exemplo
 
-RAG canônico — chunking, embeddings, busca vetorial, recuperação seletiva top-k, re-ranking e
-**avaliação da qualidade da recuperação** — em vez de *full context injection* (carregar tudo no
-prompt). O objetivo é dominar a etapa de **busca semântica seletiva** e, principalmente, tratar a
-**avaliação como cidadã de primeira classe**, não como um apêndice.
+```
+$ python scripts/ask.py "posso desistir de uma compra feita pela internet?"
 
-## Por que legislação brasileira
+Resposta: Sim. O consumidor pode desistir da compra no prazo de 7 dias a contar do
+recebimento, quando a contratação ocorre fora do estabelecimento comercial — como nas
+compras pela internet. Os valores pagos são devolvidos, monetariamente atualizados (Art. 49).
 
-Texto jurídico tem **estrutura hierárquica nativa** (lei → artigo → parágrafo → inciso). Isso dá
-duas vantagens que definem a arquitetura:
+Artigos citados: Art. 49
+Recuperados (top-5): art_49, art_35, art_18, art_54G, art_41
+```
 
-1. **Chunking não é chute.** A unidade semântica do domínio é o artigo — então o chunk é o
-   artigo, não uma janela fixa de N tokens.
-2. **Avaliação de recuperação é objetiva.** Cada artigo é uma unidade com ID, então o ground
-   truth de "qual artigo responde a esta pergunta" é factual e mensurável.
+A pergunta não contém as palavras "arrependimento" nem "artigo 49" — o artigo correto é
+encontrado por **similaridade semântica**, não por casamento de palavras.
+
+---
+
+## Por que este projeto
+
+O objetivo foi dominar o **RAG canônico** — com etapa de **busca semântica seletiva** (recuperar
+só os trechos relevantes) — em vez de *full context injection* (jogar todo o corpus no prompt).
+A legislação foi escolhida de propósito: o texto legal tem **estrutura hierárquica nativa**
+(lei → artigo → parágrafo → inciso), o que traz duas vantagens de engenharia:
+
+1. **Chunking não-arbitrário:** a unidade semântica do domínio é o artigo, então o *chunk* é o
+   artigo — não uma janela fixa de N tokens.
+2. **Avaliação objetiva:** cada artigo tem um ID, então o *ground truth* de "qual artigo responde
+   a esta pergunta" é factual e mensurável.
 
 ---
 
@@ -40,76 +49,122 @@ duas vantagens que definem a arquitetura:
 
 ```mermaid
 flowchart LR
-    A[CDC - Planalto/LexML] --> B[Parsing estrutural]
+    A[CDC - Planalto] --> B[Parsing estrutural]
     B --> C[Chunking por artigo + metadados]
     C --> D[Embedding bge-m3]
     D --> E[(Postgres + pgvector<br/>HNSW + FTS)]
-    Q[Pergunta] --> R[Retrieval<br/>dense / hybrid RRF]
+    Q[Pergunta] --> R[Busca densa<br/>cosseno top-20]
     E --> R
-    R --> K[Re-rank bge-reranker-v2-m3<br/>top-20 → top-5]
+    R --> K[Re-rank cross-encoder<br/>top-20 → top-5]
     K --> G[Geração Gemini<br/>resposta + citação]
     G --> ANS[Resposta com artigos citados]
     R -.->|ground truth| EV[Avaliação<br/>recall@k / MRR / nDCG]
     G -.->|LLM-as-judge| EV
 ```
 
-### Decisões de arquitetura (o núcleo do portfólio)
+### Decisões de arquitetura
 
-| Camada | Escolha | Racional resumido |
+| Camada | Escolha | Racional |
 |---|---|---|
-| **Chunking** | Estrutural por artigo | A unidade semântica do domínio é o artigo; evita cortar no meio de uma norma. Metadados: lei, nº do artigo, §, inciso. |
-| **Embedding** | `BAAI/bge-m3` (dense, 1024-d) | Melhor encoder denso multilíngue open-source, PT-BR forte, contexto longo (8k) para artigos extensos. Treinado para *retrieval*, não classificação. Plugável. |
-| **Vector store** | Postgres + `pgvector` (HNSW) | Vetor como "mais uma coluna"; zero custo; um container; habilita hybrid sem serviço extra. |
-| **Retrieval** | dense (baseline) → hybrid dense+lexical (RRF) | Lexical via Full-Text Search nativo do Postgres (`portuguese`); termos jurídicos exatos importam. Hybrid entra como **experimento medido**, não como suposição. |
-| **Re-ranking** | `BAAI/bge-reranker-v2-m3` (cross-encoder) | Rerankeia top-20 → top-5. Valor **provado por avaliação**, não afirmado. |
-| **Geração** | Gemini (free tier), system instructions + saída estruturada | Resposta ancorada nos artigos recuperados, com citação explícita. |
-| **Avaliação** | recall@k / MRR / nDCG à mão + Gemini-as-judge | Métricas de recuperação escritas na mão (entender > importar). Qualidade da resposta: groundedness + acurácia de citação. RAGAS como cross-check opcional. |
-
-Detalhamento e trade-offs completos (incluindo *quando eu NÃO usaria estas escolhas*): ver
-[`docs/decisoes.md`](docs/decisoes.md) _(a escrever)_.
+| **Chunking** | Estrutural por artigo | A unidade semântica do domínio é o artigo; evita cortar uma norma ao meio. Metadados: lei, nº, §, inciso. |
+| **Embedding** | `BAAI/bge-m3` (dense, 1024-d) | Encoder denso multilíngue treinado para *retrieval*, PT-BR forte, contexto longo (8k). Open-source, roda em CPU. Plugável via config. |
+| **Vector store** | Postgres + `pgvector` (HNSW) | Vetor como "mais uma coluna" (índice HNSW / cosseno); zero custo; e habilita busca híbrida (FTS `portuguese`) sem serviço extra. |
+| **Retrieval** | Denso (cosseno) → re-ranking | Duas etapas: bi-encoder recupera rápido, cross-encoder reordena com precisão. |
+| **Re-ranking** | `BAAI/bge-reranker-v2-m3` | Cross-encoder lê o par (pergunta, artigo) junto — recupera nuances que o embedding diluído perde. Ganho **comprovado por experimento** (abaixo). |
+| **Geração** | Gemini + saída estruturada | *System instruction* anti-alucinação (responde só com base no contexto), citação verificável (JSON), `temperature=0`. |
+| **Avaliação** | Métricas à mão + LLM-as-judge | Recuperação: recall@k, MRR, nDCG. Geração: acurácia de citação (objetiva) + *groundedness* (Gemini-juiz). |
 
 ---
 
-## Custo
+## Resultados da avaliação
 
-Roda inteiro em **free tier / zero gasto**: embeddings e reranker open-source em CPU local,
-Postgres em Docker, geração no free tier do Gemini. `docker compose up` + uma chave grátis do
-Gemini e funciona — sem billing.
+Avaliação de **recuperação** sobre um *dataset* de 18 perguntas em linguagem leiga, com ground
+truth por artigo (`evalset/questions.jsonl`). Comparação **busca densa** vs **densa + re-ranking**:
 
-## Setup
+| métrica | densa | densa + rerank |
+|---|---:|---:|
+| Hit@1 | 0,833 | **0,944** |
+| Hit@3 | 0,944 | **1,000** |
+| Recall@5 | 0,944 | **1,000** |
+| nDCG@10 | 0,923 | **0,979** |
+| MRR | 0,898 | **0,972** |
+
+**Leitura:** a busca densa já é forte (o artigo certo vem em 1º em 83% dos casos). O re-ranking
+eleva o MRR de 0,898 → 0,972 **sem nenhuma regressão** e conserta os casos difíceis — em especial
+uma pergunta sobre *venda casada*, cujo artigo (um artigo-lista longo, que dilui o embedding) subiu
+da 6ª para a 2ª posição. O resíduo desse caso motiva o próximo experimento (busca híbrida lexical).
+
+> A avaliação de **geração** (acurácia de citação + *groundedness* via Gemini-as-judge) está
+> implementada em `scripts/evaluate_generation.py`; os números são coletados por amostragem devido
+> ao limite de requisições do *free tier*.
+
+---
+
+## Como rodar
+
+Pré-requisitos: Python 3.11+, PostgreSQL 16+ com a extensão **pgvector**, e uma chave gratuita do
+Gemini ([Google AI Studio](https://aistudio.google.com/apikey)).
 
 ```bash
-# 1. Subir o Postgres com pgvector
-docker compose up -d
+# 1. Postgres + pgvector (exemplo com Homebrew no macOS)
+brew install postgresql@17 pgvector
+brew services start postgresql@17
+psql -d postgres -c "CREATE ROLE rag LOGIN PASSWORD 'rag' SUPERUSER;" -c "CREATE DATABASE rag OWNER rag;"
+psql -d rag -c "CREATE EXTENSION IF NOT EXISTS vector;"
+psql -d rag -f db/schema.sql
 
 # 2. Ambiente Python
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
 
-# 3. Configurar variáveis
-cp .env.example .env   # e preencher GEMINI_API_KEY
+# 3. Config
+cp .env.example .env      # preencha GEMINI_API_KEY
+
+# 4. Pipeline
+python scripts/ingest.py       # baixa e faz parsing estrutural do CDC
+python scripts/index.py        # gera embeddings e indexa no pgvector
+python scripts/ask.py "posso cancelar uma compra feita online?"
+python scripts/evaluate.py     # avaliação de recuperação (densa vs rerank)
 ```
 
-## Uso _(a implementar por etapa)_
+> Alternativa em container: o `docker-compose.yml` sobe o Postgres+pgvector já com a extensão
+> habilitada (`docker compose up -d`), para quem preferir não instalar o Postgres nativamente.
 
-```bash
-python scripts/ingest.py      # baixa e faz parsing estrutural do CDC
-python scripts/index.py       # gera embeddings e indexa no pgvector
-python scripts/ask.py "..."   # pergunta → resposta com citação
-python scripts/evaluate.py    # roda a suíte de avaliação
+---
+
+## Estrutura
+
+```
+src/rag/
+├── ingest/       # download + parsing estrutural do CDC
+├── chunking/     # chunk por artigo + metadados
+├── embeddings/   # bge-m3 (interface plugável)
+├── store/        # pgvector + FTS
+├── retrieval/    # busca densa, rerank, duas etapas
+├── generation/   # Gemini + citação estruturada
+└── eval/         # métricas (recall@k/MRR/nDCG) + LLM-as-judge
+scripts/          # ingest, index, ask, evaluate, evaluate_generation
+evalset/          # dataset de avaliação (ground truth)
+db/schema.sql     # tabela + índices HNSW/GIN
 ```
 
-## Roadmap
+---
 
-- [x] Esqueleto do projeto (estrutura, docker, config, README)
-- [x] **Etapa 1** — Ingestão + chunking estrutural do CDC (108 artigos; 11 vetados excluídos)
-- [x] **Etapa 2** — Embeddings + indexação no pgvector (bge-m3, 108 vetores, HNSW + FTS)
-- [x] **Etapa 3** — Retrieval (dense) + geração com citação (Gemini)
-- [x] **Etapa 4** — Avaliação de recuperação (recall@k / MRR / nDCG) + eval-set (18 perguntas; baseline denso MRR 0.898)
-- [x] **Etapa 5** — Re-ranking (cross-encoder) + experimento comparativo. Rerank elevou MRR 0.898→0.972 e Hit@1 0.833→0.944, sem regressões. (Extensão futura: busca híbrida lexical.)
-- [x] **Etapa 6** — Avaliação de geração: citação (objetiva) + groundedness (Gemini-as-judge). Código completo; execução em amostra por limite de free tier (~20 req/dia)
-- [ ] Polimento: `docs/decisoes.md`, testes, README final
+## Status
+
+- [x] Ingestão + chunking estrutural do CDC
+- [x] Embeddings (bge-m3) + indexação no pgvector (HNSW + FTS)
+- [x] Busca densa + geração com citação (Gemini)
+- [x] Avaliação de recuperação (recall@k / MRR / nDCG) + eval-set
+- [x] Re-ranking (cross-encoder) + experimento comparativo
+- [x] Avaliação de geração (citação + groundedness) — código completo
+- [ ] Busca híbrida lexical (denso + FTS via RRF) — experimento futuro
+
+## Custo
+
+Roda inteiro em **free tier / custo zero**: embeddings e reranker open-source em CPU, Postgres
+local, geração no *free tier* do Gemini.
 
 ## Licença
 
-MIT _(a definir)_.
+MIT.
