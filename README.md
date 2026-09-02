@@ -182,3 +182,8 @@ local, geração no *free tier* do Gemini.
 ## Licença
 
 MIT.
+
+---
+
+Desenvolvido por **Greyce Dourado** — Analista de Dados Sênior.
+[LinkedIn](https://www.linkedin.com/in/greyce-dourado) · [GitHub](https://github.com/Greyce-Dourado)
