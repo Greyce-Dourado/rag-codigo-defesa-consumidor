@@ -49,17 +49,17 @@ A legislação foi escolhida de propósito: o texto legal tem **estrutura hierá
 
 ```mermaid
 flowchart LR
-    A[CDC - Planalto] --> B[Parsing estrutural]
-    B --> C[Chunking por artigo + metadados]
-    C --> D[Embedding bge-m3]
-    D --> E[(Postgres + pgvector<br/>HNSW + FTS)]
-    Q[Pergunta] --> R[Busca densa<br/>cosseno top-20]
+    A["CDC (Planalto)"] --> B["Parsing estrutural"]
+    B --> C["Chunking por artigo"]
+    C --> D["Embedding bge-m3"]
+    D --> E[("Postgres + pgvector<br/>HNSW + FTS")]
+    Q["Pergunta"] --> R["Busca densa (cosseno)"]
     E --> R
-    R --> K[Re-rank cross-encoder<br/>top-20 → top-5]
-    K --> G[Geração Gemini<br/>resposta + citação]
-    G --> ANS[Resposta com artigos citados]
-    R -.->|ground truth| EV[Avaliação<br/>recall@k / MRR / nDCG]
-    G -.->|LLM-as-judge| EV
+    R --> K["Re-ranking (cross-encoder)"]
+    K --> G["Geração (Gemini) + citação"]
+    G --> ANS["Resposta com artigos citados"]
+    R -.->|"ground truth"| EV["Avaliação: recall@k, MRR, nDCG"]
+    G -.->|"LLM-as-judge"| EV
 ```
 
 ### Decisões de arquitetura
