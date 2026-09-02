@@ -78,6 +78,8 @@ flowchart LR
 
 ## Resultados da avaliação
 
+### Recuperação
+
 Avaliação de **recuperação** sobre um *dataset* de 18 perguntas em linguagem leiga, com ground
 truth por artigo (`evalset/questions.jsonl`). Comparação **busca densa** vs **densa + re-ranking**:
 
@@ -94,9 +96,21 @@ eleva o MRR de 0,898 → 0,972 **sem nenhuma regressão** e conserta os casos di
 uma pergunta sobre *venda casada*, cujo artigo (um artigo-lista longo, que dilui o embedding) subiu
 da 6ª para a 2ª posição. O resíduo desse caso motiva o próximo experimento (busca híbrida lexical).
 
-> A avaliação de **geração** (acurácia de citação + *groundedness* via Gemini-as-judge) está
-> implementada em `scripts/evaluate_generation.py`; os números são coletados por amostragem devido
-> ao limite de requisições do *free tier*.
+### Geração
+
+Avaliação da resposta gerada (`scripts/evaluate_generation.py`), em amostra de 8 perguntas
+(limite do *free tier* do Gemini):
+
+| métrica | resultado |
+|---|---:|
+| Acurácia de citação (cita o artigo correto) | **8/8 = 100%** |
+| Groundedness média (fidelidade ao contexto, via Gemini-as-judge) | **1,00** |
+
+Na amostra, a resposta citou o artigo correto em todas as perguntas e o juiz não detectou
+alucinação — coerente com a *system instruction* que prende a resposta ao contexto recuperado.
+**Ressalva metodológica:** a amostra é pequena e o *LLM-as-judge* é um proxy (não verdade
+absoluta); uma avaliação mais robusta pediria amostra maior e revisão humana de parte dos
+julgamentos.
 
 ---
 
@@ -157,7 +171,7 @@ db/schema.sql     # tabela + índices HNSW/GIN
 - [x] Busca densa + geração com citação (Gemini)
 - [x] Avaliação de recuperação (recall@k / MRR / nDCG) + eval-set
 - [x] Re-ranking (cross-encoder) + experimento comparativo
-- [x] Avaliação de geração (citação + groundedness) — código completo
+- [x] Avaliação de geração (citação + groundedness): amostra N=8 → citação 100%, groundedness 1,00
 - [ ] Busca híbrida lexical (denso + FTS via RRF) — experimento futuro
 
 ## Custo

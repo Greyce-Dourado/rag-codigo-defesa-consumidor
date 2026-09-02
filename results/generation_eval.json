@@ -1,0 +1,90 @@
+{
+  "n": 8,
+  "acuracia_citacao": 1.0,
+  "groundedness_media": 1.0,
+  "por_pergunta": [
+    {
+      "id": "q001",
+      "esperado": "art_49",
+      "citou": true,
+      "citados": [
+        "Art. 49"
+      ],
+      "groundedness": 1.0,
+      "justificativa": "Toda a resposta é diretamente sustentada pelo texto do Artigo 49 presente no contexto."
+    },
+    {
+      "id": "q002",
+      "esperado": "art_18",
+      "citou": true,
+      "citados": [
+        "Art. 18"
+      ],
+      "groundedness": 1.0,
+      "justificativa": "Toda a resposta está perfeitamente embasada no Artigo 18, § 1° do CDC presente no contexto."
+    },
+    {
+      "id": "q003",
+      "esperado": "art_2",
+      "citou": true,
+      "citados": [
+        "Art. 2",
+        "Art. 29"
+      ],
+      "groundedness": 1.0,
+      "justificativa": "Toda a resposta está fundamentada diretamente nos textos dos artigos 2º e 29 do CDC apresentados no contexto."
+    },
+    {
+      "id": "q004",
+      "esperado": "art_3",
+      "citou": true,
+      "citados": [
+        "Art. 3"
+      ],
+      "groundedness": 1.0,
+      "justificativa": "A resposta é inteiramente sustentada pelo Artigo 3º do CDC, presente no contexto fornecido."
+    },
+    {
+      "id": "q005",
+      "esperado": "art_6",
+      "citou": true,
+      "citados": [
+        "Art. 6",
+        "Art. 31",
+        "Art. 50"
+      ],
+      "groundedness": 1.0,
+      "justificativa": "Todas as garantias e direitos citados na resposta estão estritamente fundamentados nos artigos do CDC apresentados no contexto."
+    },
+    {
+      "id": "q006",
+      "esperado": "art_26",
+      "citou": true,
+      "citados": [
+        "Art. 26"
+      ],
+      "groundedness": 1.0,
+      "justificativa": "Toda a resposta está perfeitamente fundamentada nas disposições do Artigo 26 constantes no contexto."
+    },
+    {
+      "id": "q007",
+      "esperado": "art_27",
+      "citou": true,
+      "citados": [
+        "Art. 27"
+      ],
+      "groundedness": 1.0,
+      "justificativa": "Toda a resposta é diretamente sustentada pelas informações do Art. 27 presente no contexto fornecido."
+    },
+    {
+      "id": "q008",
+      "esperado": "art_42",
+      "citou": true,
+      "citados": [
+        "Art. 42"
+      ],
+      "groundedness": 1.0,
+      "justificativa": "Toda a resposta está diretamente fundamentada no parágrafo único do Art. 42 do CDC presente no contexto."
+    }
+  ]
+}
