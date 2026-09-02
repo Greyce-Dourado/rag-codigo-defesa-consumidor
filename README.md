@@ -47,20 +47,7 @@ A legislação foi escolhida de propósito: o texto legal tem **estrutura hierá
 
 ## Arquitetura
 
-```mermaid
-flowchart LR
-    A["CDC (Planalto)"] --> B["Parsing estrutural"]
-    B --> C["Chunking por artigo"]
-    C --> D["Embedding bge-m3"]
-    D --> E[("Postgres + pgvector<br/>HNSW + FTS")]
-    Q["Pergunta"] --> R["Busca densa (cosseno)"]
-    E --> R
-    R --> K["Re-ranking (cross-encoder)"]
-    K --> G["Geração (Gemini) + citação"]
-    G --> ANS["Resposta com artigos citados"]
-    R -.->|"ground truth"| EV["Avaliação: recall@k, MRR, nDCG"]
-    G -.->|"LLM-as-judge"| EV
-```
+![Arquitetura do RAG-CDC: os caminhos de indexação (offline) e de consulta (online) convergem no índice vetorial (pgvector/HNSW); recuperação densa, re-ranking com cross-encoder e geração ancorada com citação, cercados por uma camada de avaliação.](docs/arquitetura.png)
 
 ### Decisões de arquitetura
 

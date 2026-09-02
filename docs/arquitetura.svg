@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 810" width="1240" height="810" font-family="'Helvetica Neue', Arial, sans-serif">
+  <style>
+    .bg{ fill:#FBFBFD; }
+    .box-engine{ fill:#EEEFFA; stroke:#D7DAF1; }
+    .box-pipeline{ fill:none; stroke:#CFCBEF; stroke-dasharray:5 6; }
+    .card-layer{ fill:#F5F4FD; stroke:#CFCBEF; }
+    .card-src{ fill:#F3F4F7; stroke:#E1E3EC; }
+    .card-out{ fill:#E7F5EF; stroke:#BEE3D2; }
+    .card-eval{ fill:#F1F3F8; stroke:#D8DDEA; }
+    .store{ fill:#ECEBFB; stroke:#C9C6EE; }
+    .pill{ fill:#FFFFFF; stroke:#E6E7F1; }
+    .edge{ stroke:#98A0BC; fill:none; stroke-width:1.7; }
+    .edge.d{ stroke-dasharray:5 6; }
+    .ahead{ fill:#98A0BC; }
+    .t-title{ fill:#1B2130; font-weight:800; }
+    .t-sub{ fill:#6A7290; font-weight:600; }
+    .t-h{ fill:#1B2130; font-weight:700; }
+    .t-acc{ fill:#5B5BD6; font-weight:700; }
+    .t-out{ fill:#1F6B51; font-weight:700; }
+    .t-mut{ fill:#6A7290; font-weight:600; }
+    .eyebrow{ fill:#5B5BD6; font-weight:700; letter-spacing:.14em; }
+    .mono{ font-family:'Menlo','JetBrains Mono',monospace; }
+    .elabel{ fill:#6A7290; font-weight:500; }
+    rect[rx]{ }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="ahead" d="M0,0 L10,5 L0,10 z"></path>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1240" height="810"></rect>
+
+  <rect class="box-engine" x="250" y="60" width="760" height="700" rx="24"></rect>
+  <text class="t-title" x="630" y="99" font-size="17" text-anchor="middle">Motor RAG</text>
+  <text class="t-sub" x="630" y="120" font-size="12.5" text-anchor="middle">recuperação seletiva + geração ancorada · custo zero</text>
+
+  <rect class="box-pipeline" x="272" y="140" width="716" height="402" rx="16"></rect>
+  <text class="eyebrow" x="290" y="161" font-size="10">PIPELINE CANÔNICO</text>
+
+  <rect class="card-layer" x="490" y="172" width="280" height="104" rx="14"></rect>
+  <text class="t-h" x="506" y="196" font-size="13.5">Indexação · offline</text>
+  <rect class="pill" x="506" y="206" width="248" height="26" rx="8"></rect>
+  <text class="mono t-mut" x="518" y="223" font-size="11">chunking estrutural por artigo</text>
+  <rect class="pill" x="506" y="238" width="248" height="26" rx="8"></rect>
+  <text class="mono t-mut" x="518" y="255" font-size="11">embeddings · bge-m3 (1024-d)</text>
+
+  <rect class="store" x="490" y="296" width="280" height="60" rx="14"></rect>
+  <text class="t-h" x="630" y="320" font-size="13.5" text-anchor="middle">pgvector · índice HNSW</text>
+  <text class="mono t-mut" x="630" y="339" font-size="11" text-anchor="middle">busca por cosseno + FTS</text>
+
+  <rect class="card-layer" x="300" y="384" width="300" height="140" rx="14"></rect>
+  <text class="t-h" x="316" y="410" font-size="13.5">Recuperação</text>
+  <rect class="pill" x="316" y="420" width="268" height="26" rx="8"></rect>
+  <text class="mono t-mut" x="328" y="437" font-size="11">busca densa · cosseno (top-20)</text>
+  <rect class="pill" x="316" y="452" width="268" height="26" rx="8"></rect>
+  <text class="mono t-mut" x="328" y="469" font-size="11">re-ranking · cross-encoder</text>
+  <text class="t-mut" x="316" y="502" font-size="11.5">bge-reranker-v2-m3 → top-5</text>
+
+  <rect class="card-layer" x="640" y="384" width="300" height="140" rx="14"></rect>
+  <text class="t-h" x="656" y="410" font-size="13.5">Geração</text>
+  <rect class="pill" x="656" y="420" width="268" height="26" rx="8"></rect>
+  <text class="mono t-mut" x="668" y="437" font-size="11">Gemini · system instruction</text>
+  <rect class="pill" x="656" y="452" width="268" height="26" rx="8"></rect>
+  <text class="mono t-mut" x="668" y="469" font-size="11">saída estruturada + citação</text>
+  <text class="t-mut" x="656" y="502" font-size="11.5">temperature 0 · anti-alucinação</text>
+
+  <rect class="card-eval" x="300" y="556" width="640" height="120" rx="16"></rect>
+  <text class="t-acc" x="320" y="584" font-size="13.5">Avaliação</text>
+  <rect class="pill" x="320" y="596" width="600" height="28" rx="8"></rect>
+  <text class="mono t-mut" x="332" y="614" font-size="11">recuperação · recall@k · MRR · nDCG    →    densa 0,898  →  +rerank 0,972</text>
+  <rect class="pill" x="320" y="632" width="600" height="28" rx="8"></rect>
+  <text class="mono t-mut" x="332" y="650" font-size="11">geração · citação 100% · groundedness 1,00  (LLM-as-judge, amostra)</text>
+
+  <rect class="card-src" x="44" y="172" width="160" height="104" rx="14"></rect>
+  <text class="t-h" x="124" y="216" font-size="15" text-anchor="middle">CDC</text>
+  <text class="t-mut" x="124" y="236" font-size="11.5" text-anchor="middle">Planalto · 108 artigos</text>
+
+  <rect class="card-src" x="44" y="402" width="160" height="104" rx="14"></rect>
+  <text class="t-h" x="124" y="446" font-size="15" text-anchor="middle">Pergunta</text>
+  <text class="t-mut" x="124" y="466" font-size="11.5" text-anchor="middle">linguagem natural</text>
+
+  <rect class="card-out" x="1046" y="402" width="162" height="104" rx="14"></rect>
+  <text class="t-out" x="1127" y="446" font-size="15" text-anchor="middle">Resposta</text>
+  <text class="t-mut" x="1127" y="466" font-size="11.5" text-anchor="middle">com citação (Art.)</text>
+
+  <rect class="card-out" x="1046" y="555" width="162" height="104" rx="14"></rect>
+  <text class="t-out" x="1127" y="599" font-size="15" text-anchor="middle">Métricas</text>
+  <text class="t-mut" x="1127" y="619" font-size="11.5" text-anchor="middle">avaliação · portfólio</text>
+
+  <path class="edge" d="M204,224 L484,224" marker-end="url(#arrow)"></path>
+  <text class="mono elabel" x="344" y="216" font-size="10.5" text-anchor="middle">108 artigos</text>
+  <path class="edge" d="M630,276 L630,290" marker-end="url(#arrow)"></path>
+  <text class="mono elabel" x="642" y="288" font-size="10.5">grava</text>
+  <path class="edge" d="M600,356 L458,382" marker-end="url(#arrow)"></path>
+  <text class="mono elabel" x="556" y="368" font-size="10.5" text-anchor="middle">lê índice</text>
+  <path class="edge" d="M204,454 L294,454" marker-end="url(#arrow)"></path>
+  <text class="mono elabel" x="249" y="446" font-size="10.5" text-anchor="middle">consulta</text>
+  <path class="edge" d="M600,454 L634,454" marker-end="url(#arrow)"></path>
+  <text class="mono elabel" x="617" y="446" font-size="10.5" text-anchor="middle">top-5</text>
+  <path class="edge" d="M940,454 L1042,454" marker-end="url(#arrow)"></path>
+  <text class="mono elabel" x="991" y="446" font-size="10.5" text-anchor="middle">resposta + Art.</text>
+  <path class="edge d" d="M450,524 L450,552" marker-end="url(#arrow)"></path>
+  <text class="mono elabel" x="458" y="543" font-size="10.5">ground truth</text>
+  <path class="edge d" d="M790,524 L790,552" marker-end="url(#arrow)"></path>
+  <text class="mono elabel" x="798" y="543" font-size="10.5">LLM-judge</text>
+  <path class="edge" d="M940,607 L1042,607" marker-end="url(#arrow)"></path>
+</svg>
